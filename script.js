@@ -46,28 +46,11 @@ function bfInrpreter(bfString) {
         } else if (currentInstruction == '<') {  // '<' moves dp to the left one memory space
             dataPointer = boundChecker(dataPointer - 1);
         } else if (currentInstruction == '+') { // increments memory space pointed by dp by 1
-            if (memoryArray[dataPointer]+1 > cellSize) { // cell size checker
-                console.log("Warning: Instruction incremented beyond max size of cell, ignored.");
-            } else {
-                memoryArray[dataPointer]++;
-            }
+            memoryArray[dataPointer] = flowProtection(memoryArray[dataPointer] + 1);
         } else if (currentInstruction == '-') { // decrements memory space pointed by dp by 1
-            if (memoryArray[dataPointer]-1 < 0) { // cell size checker
-                console.log("Warning: Instruction incremented below 0, ignored.");
-            } else {
-                memoryArray[dataPointer]--;
-            }
+            memoryArray[dataPointer] = flowProtection(memoryArray[dataPointer] - 1);
         } else if (currentInstruction == '.') { // prints memory space pointed by dp
-            if (memoryArray[dataPointer]< 0 || memoryArray[dataPointer] > cellSize) {
-                console.log("Error: Encounted unexpected memory value");
-            } else if (memoryArray[dataPointer] < 32) {
-                strOutput += String.fromCharCode(memoryArray[dataPointer]);
-                //console.log(String.fromCharCode(memoryArray[dataPointer]));
-                console.log("Warning: Encounted whitespace ASCII, may cause error.");
-            } else {
-                strOutput += String.fromCharCode(memoryArray[dataPointer]);
-                // console.log(String.fromCharCode(memoryArray[dataPointer]));
-            }
+            printHandler(memoryArray[dataPointer]);
         } else if (currentInstruction == ',') { // Accepts input
             console.log("To be added");
         } else if (currentInstruction == '[') { // Begins loop, if dp points to memory that is 0, jumps to after next ']'
@@ -78,7 +61,8 @@ function bfInrpreter(bfString) {
             instructionPointer += maxJumpSize;
         } else if (currentInstruction == ']') { // Can end loop, if dp points to memory that is non-0 jumps back to previous ']'
             console.log("Error: Encounted unexpected ']'. Forcing ending program.");
-            break;
+            printDebug(strOutput);   
+            return strOutput; 
         } else { // Other then <>+-.,[] all other charcters are ignored.
             console.log("Ignored as comment.")
         }
@@ -97,6 +81,28 @@ function boundChecker(newDataPointer) {
         return dataPointer;
     } else {
         return newDataPointer;
+    }
+}
+
+function flowProtection(newCellValue) {
+    if (newCellValue > cellSize || newCellValue < 0 ) {
+        console.log("Warning: Instruction would cause overflow/underflow, ignored.");
+        return memoryArray[dataPointer];
+    } else {
+        return newCellValue;
+    } 
+}
+
+function printHandler(cellValue) {
+    if (cellValue < 0 || cellValue > cellSize) {
+        console.log("Error: Encounted unexpected memory value");
+    } else if (cellValue < 32) {
+        strOutput += String.fromCharCode(cellValue);
+        //console.log(String.fromCharCode(memoryArray[dataPointer]));
+        console.log("Warning: Encounted whitespace ASCII, may cause error.");
+    } else {
+        strOutput += String.fromCharCode(cellValue);
+        // console.log(String.fromCharCode(memoryArray[dataPointer]));
     }
 }
 
