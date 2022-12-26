@@ -30,40 +30,42 @@ function bfInrpreter(bfString) {
 
     // Start the program
     while (true) {
-        // console.log(memoryArray);
         // End program when reaching end of the program
         if (instructionPointer >= bfStringConst.length ) {
             console.log("Reached end of program.");
             break;
         }
 
+        // Get next instruction
         let currentInstruction = bfStringConst.charAt(instructionPointer);
-        // console.log(currentInstruction);
-        if (currentInstruction == '>') {
-            if (dataPointer + 1 >= memorySize) {
+        console.log(`Current instruction: ${currentInstruction}`);
+
+        // Instruction handler
+        if (currentInstruction == '>') { // '>' moves dp to the right one memory space
+            if (dataPointer + 1 >= memorySize) { // bound checker
                 console.log("Warning: Pointer incremented outside of memory, ignored.");
             } else {
                 dataPointer++;
             }
-        } else if (currentInstruction == '<') {
-            if (dataPointer - 1 < 0) {
+        } else if (currentInstruction == '<') {  // '<' moves dp to the left one memory space
+            if (dataPointer - 1 < 0) { // bound checker
                 console.log("Warning: Pointer incremented outside of memory, ignored.");
             } else {
                 dataPointer--;
             }
-        } else if (currentInstruction == '+') {
-            if (memoryArray[dataPointer]+1 > cellSize) {
+        } else if (currentInstruction == '+') { // increments memory space pointed by dp by 1
+            if (memoryArray[dataPointer]+1 > cellSize) { // cell size checker
                 console.log("Warning: Instruction incremented beyond max size of cell, ignored.");
             } else {
                 memoryArray[dataPointer]++;
             }
-        } else if (currentInstruction == '-') {
-            if (memoryArray[dataPointer]-1 < 0) {
+        } else if (currentInstruction == '-') { // decrements memory space pointed by dp by 1
+            if (memoryArray[dataPointer]-1 < 0) { // cell size checker
                 console.log("Warning: Instruction incremented below 0, ignored.");
             } else {
                 memoryArray[dataPointer]--;
             }
-        } else if (currentInstruction == '.') {
+        } else if (currentInstruction == '.') { // prints memory space pointed by dp
             if (memoryArray[dataPointer]< 0 || memoryArray[dataPointer] > cellSize) {
                 console.log("Error: Encounted unexpected memory value");
             } else if (memoryArray[dataPointer] < 32) {
@@ -74,19 +76,18 @@ function bfInrpreter(bfString) {
                 strOutput += String.fromCharCode(memoryArray[dataPointer]);
                 // console.log(String.fromCharCode(memoryArray[dataPointer]));
             }
-        } else if (currentInstruction == ',') {
+        } else if (currentInstruction == ',') { // Accepts input
             console.log("To be added");
-        } else if (currentInstruction == '[') {
+        } else if (currentInstruction == '[') { // Begins loop, if dp points to memory that is 0, jumps to after next ']'
             console.log("Calling, jump");
             let maxJumpSize = jumpHandler(bfStringConst);
             if (maxJumpSize == -1) return -1;
             console.log("Back from, jump");
             instructionPointer += maxJumpSize;
-        } else if (currentInstruction == ']') {
+        } else if (currentInstruction == ']') { // Can end loop, if dp points to memory that is non-0 jumps back to previous ']'
             console.log("Error: Encounted unexpected ']'. Forcing ending program.");
             break;
-        } else {
-            // Other then <>+-.,[] all other charcters are ignored.
+        } else { // Other then <>+-.,[] all other charcters are ignored.
             console.log("Ignored as comment.")
         }
 
@@ -96,6 +97,14 @@ function bfInrpreter(bfString) {
 
     printDebug(strOutput);   
     return strOutput; 
+}
+
+function boundChecker(newDataPointer) {
+    if (newDataPointer >= memorySize || newDataPointer < 0 ) {
+        return dataPointer;
+    } else {
+        return newDataPointer;
+    }
 }
 
 function jumpHandler(bfString) {
