@@ -42,17 +42,9 @@ function bfInrpreter(bfString) {
 
         // Instruction handler
         if (currentInstruction == '>') { // '>' moves dp to the right one memory space
-            if (dataPointer + 1 >= memorySize) { // bound checker
-                console.log("Warning: Pointer incremented outside of memory, ignored.");
-            } else {
-                dataPointer++;
-            }
+            dataPointer = boundChecker(dataPointer + 1);
         } else if (currentInstruction == '<') {  // '<' moves dp to the left one memory space
-            if (dataPointer - 1 < 0) { // bound checker
-                console.log("Warning: Pointer incremented outside of memory, ignored.");
-            } else {
-                dataPointer--;
-            }
+            dataPointer = boundChecker(dataPointer - 1);
         } else if (currentInstruction == '+') { // increments memory space pointed by dp by 1
             if (memoryArray[dataPointer]+1 > cellSize) { // cell size checker
                 console.log("Warning: Instruction incremented beyond max size of cell, ignored.");
@@ -101,6 +93,7 @@ function bfInrpreter(bfString) {
 
 function boundChecker(newDataPointer) {
     if (newDataPointer >= memorySize || newDataPointer < 0 ) {
+        console.log("Warning: Pointer moved outside of memory, ignored.");
         return dataPointer;
     } else {
         return newDataPointer;
