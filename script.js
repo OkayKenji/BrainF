@@ -16,6 +16,10 @@ function bfInrpreter(bfString) {
     // To mark the code as read-only
     const bfStringConst = bfString;
 
+    if (!brackChecker(bfString)) {
+        return -1;    
+    }
+
     // Allocates the memory space for the array of 0s
     memoryArray = [];
     memoryArray.length = memorySize;
@@ -172,6 +176,29 @@ function jumpHandler(bfString) {
         jumpSize++;
     }
     return maxJumpSize;
+}
+
+function brackChecker(bfString) {
+    // To mark the code as read-only
+    const bfStringConst = bfString;
+    let stack = [];
+
+    for (let command of bfStringConst) {
+        if (command == '[') {
+            stack.push('[');
+        } else if (command == ']') {
+            if (stack.length == 0) {
+                return false;
+            } else {
+                stack.pop();
+            }
+        }
+    }
+
+    if (stack.length == 0)
+        return true;
+    else
+        return false;
 }
 
 function printDebug(printDebug) {
