@@ -118,40 +118,17 @@ function jumpHandler(bfString) {
         let currentInstruction = bfStringConst.charAt(currentInstructionIndex);
         // console.log(currentInstruction);
 
-        if (currentInstruction == '>') {
-            if (dataPointer + 1 >= memorySize) {
-                console.log("Warning: Pointer incremented outside of memory, ignored.");
-            } else {
-                dataPointer++;
-            }
-        } else if (currentInstruction == '<') {
-            if (dataPointer - 1 < 0) {
-                console.log("Warning: Pointer incremented outside of memory, ignored.");
-            } else {
-                dataPointer--;
-            }
-        } else if (currentInstruction == '+') {
-            if (memoryArray[dataPointer]+1 > cellSize) {
-                console.log("Warning: Instruction incremented beyond max size of cell, ignored.");
-            } else {
-                memoryArray[dataPointer]++;
-            }
-        } else if (currentInstruction == '-') {
-            if (memoryArray[dataPointer]-1 < 0) {
-                console.log("Warning: Instruction incremented below 0, ignored.");
-            } else {
-                memoryArray[dataPointer]--;
-            }
-        } else if (currentInstruction == '.') {
-            if (memoryArray[dataPointer]< 0 || memoryArray[dataPointer] > cellSize) {
-                console.log("Error: Encounted unexpected memory value");
-            } else if (memoryArray[dataPointer] < 32) {
-                console.log("Warning: Encounted whitespace ASCII, ignored.");
-            } else {
-                strOutput += String.fromCharCode(memoryArray[dataPointer]);
-                console.log(String.fromCharCode(memoryArray[dataPointer]));
-            }
-        } else if (currentInstruction == ',') {
+        if (currentInstruction == '>') { // '>' moves dp to the right one memory space
+            dataPointer = boundChecker(dataPointer + 1);
+        } else if (currentInstruction == '<') {  // '<' moves dp to the left one memory space
+            dataPointer = boundChecker(dataPointer - 1);
+        } else if (currentInstruction == '+') { // increments memory space pointed by dp by 1
+            memoryArray[dataPointer] = flowProtection(memoryArray[dataPointer] + 1);
+        } else if (currentInstruction == '-') { // decrements memory space pointed by dp by 1
+            memoryArray[dataPointer] = flowProtection(memoryArray[dataPointer] - 1);
+        } else if (currentInstruction == '.') { // prints memory space pointed by dp
+            printHandler(memoryArray[dataPointer]);
+        } else if (currentInstruction == ',') { // Accepts input
             console.log("To be added");
         } else if (currentInstruction == '[') {
             console.log("Nested loops not supported!");
