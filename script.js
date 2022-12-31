@@ -7,7 +7,7 @@ const cellSize = 127; //in decimal
 
 function output() {
     const input = document.getElementById('input').value;
-    console.log(input);
+    // console.log(input);
     const output = bfInrpreter(input);
     document.getElementById('output').value = output;
 }
@@ -16,7 +16,7 @@ function bfInrpreter(bfString) {
     // To mark the code as read-only
     const bfStringConst = bfString;
 
-    if (!brackChecker(bfString)) {
+    if (!bracketChecker(bfString)) {
         return -1;    
     }
 
@@ -42,7 +42,7 @@ function bfInrpreter(bfString) {
 
         // Get next instruction
         let currentInstruction = bfStringConst.charAt(instructionPointer);
-        console.log(`Current instruction: ${currentInstruction}`);
+        // console.log(`Current instruction: ${currentInstruction}`);
 
         // Instruction handler
         if (currentInstruction == '>') { // '>' moves dp to the right one memory space
@@ -58,15 +58,17 @@ function bfInrpreter(bfString) {
         } else if (currentInstruction == ',') { // Accepts input
             console.log("To be added");
         } else if (currentInstruction == '[') { // Begins loop, if dp points to memory that is 0, jumps to after next ']'
-            console.log("Calling, jump");
-            let maxJumpSize = jumpHandler(bfStringConst);
-            if (maxJumpSize == -1) return -1;
-            console.log("Back from, jump");
-            instructionPointer += maxJumpSize;
+            if (memoryArray[dataPointer] == 0) {
+                instructionPointer = bracketMatchingRight(bfString,instructionPointer) + 1; 
+                // console.log(instructionPointer);
+                continue;
+            }
         } else if (currentInstruction == ']') { // Can end loop, if dp points to memory that is non-0 jumps back to previous ']'
-            console.log("Error: Encounted unexpected ']'. Forcing ending program.");
-            printDebug(strOutput);   
-            return strOutput; 
+            if (memoryArray[dataPointer] != 0) {
+                instructionPointer = bracketMatchingLeft(bfString,instructionPointer); 
+                // console.log(instructionPointer);
+                continue;
+            }            
         } else { // Other then <>+-.,[] all other charcters are ignored.
             console.log("Ignored as comment.")
         }
@@ -110,51 +112,36 @@ function printHandler(cellValue) {
     }
 }
 
-function jumpHandler(bfString) {
-    const bfStringConst = bfString;
-
-    let jumpSize = 1;
-    let maxJumpSize = 1;
-    while(true) {
-        // console.log(memoryArray);
-
-        let currentInstructionIndex = instructionPointer + jumpSize;
-        let currentInstruction = bfStringConst.charAt(currentInstructionIndex);
-        // console.log(currentInstruction);
-
-        if (currentInstruction == '>') { // '>' moves dp to the right one memory space
-            dataPointer = boundChecker(dataPointer + 1);
-        } else if (currentInstruction == '<') {  // '<' moves dp to the left one memory space
-            dataPointer = boundChecker(dataPointer - 1);
-        } else if (currentInstruction == '+') { // increments memory space pointed by dp by 1
-            memoryArray[dataPointer] = flowProtection(memoryArray[dataPointer] + 1);
-        } else if (currentInstruction == '-') { // decrements memory space pointed by dp by 1
-            memoryArray[dataPointer] = flowProtection(memoryArray[dataPointer] - 1);
-        } else if (currentInstruction == '.') { // prints memory space pointed by dp
-            printHandler(memoryArray[dataPointer]);
-        } else if (currentInstruction == ',') { // Accepts input
-            console.log("To be added");
-        } else if (currentInstruction == '[') {
-            console.log("Nested loops not supported!");
-            return -1;
-        } else if (currentInstruction == ']') {
-            if (memoryArray[dataPointer] == 0) {
-                console.log("Exit")
-                break;
-            } 
-            maxJumpSize = jumpSize;
-            jumpSize = 1;
-            continue;
-        } else {
-            // Other then <>+-.,[] all other charcters are ignored.
-            console.log("Ignored as comment.")
+//keep going right, if another [  do a i++. then if ], check to make sure i <= 0 else i--j
+function bracketMatchingRight(bfString,index) {
+    let offset = 0;
+    for (let i = index+1; i < bfString.length ; i++) {
+        if (bfString[i] == '[') {
+            offset++;
+        } else if (bfString[i] == ']' && offset > 0) {
+            offset--;
+        } else if (bfString[i] == ']' && offset == 0) {
+            return i;
         }
-        jumpSize++;
     }
-    return maxJumpSize;
+    return -1;
 }
 
-function brackChecker(bfString) {
+function bracketMatchingLeft(bfString,index) {
+    let offset = 0;
+    for (let i = index-1; i >= 0 ; i--) {
+        if (bfString[i] == ']') {
+            offset++;
+        } else if (bfString[i] == '[' && offset > 0) {
+            offset--;
+        } else if (bfString[i] == '[' && offset == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function bracketChecker(bfString) {
     // To mark the code as read-only
     const bfStringConst = bfString;
     let stack = [];
