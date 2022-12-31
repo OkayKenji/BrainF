@@ -56,7 +56,7 @@ function bfInrpreter(bfString) {
         } else if (currentInstruction == '.') { // prints memory space pointed by dp
             printHandler(memoryArray[dataPointer]);
         } else if (currentInstruction == ',') { // Accepts input
-            console.log("To be added");
+            memoryArray[dataPointer] = getChar();
         } else if (currentInstruction == '[') { // Begins loop, if dp points to memory that is 0, jumps to after next ']'
             if (memoryArray[dataPointer] == 0) {
                 instructionPointer = bracketMatchingRight(bfString,instructionPointer) + 1; 
@@ -171,4 +171,9 @@ function printDebug(printDebug) {
     console.log(`%iP: ${instructionPointer}`);
     console.log(`%dP: ${dataPointer}`);
     console.log(`Tested on ${memorySize} sized memory, ${cellSize} cell size`);
+}
+
+function getChar() {
+    const input = window.prompt("Enter the characher");
+    return input.charCodeAt(0);
 }
