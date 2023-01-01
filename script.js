@@ -1,13 +1,14 @@
+// Global varibles
 let memoryArray;
 let instructionPointer;
 let dataPointer;
 let strOutput;
-const memorySize = 10;
+const memorySize = 30000;
 const cellSize = 127; //in decimal
 
+// Parent function to call all other functions
 function output() {
     const input = document.getElementById('input').value;
-    // console.log(input);
     const output = bfInrpreter(input);
     document.getElementById('output').value = output;
 }
@@ -16,8 +17,9 @@ function bfInrpreter(bfString) {
     // To mark the code as read-only
     const bfStringConst = bfString;
 
+    // Parses bf code to check bracket balancing
     if (!bracketChecker(bfString)) {
-        return -1;    
+        return "Unbalanced number of brackets."; 
     }
 
     // Allocates the memory space for the array of 0s
@@ -29,12 +31,12 @@ function bfInrpreter(bfString) {
     instructionPointer = 0; 
     dataPointer = 0; 
 
-    //Degbug:
+    //Stores output
     strOutput = "";
 
     // Start the program
     while (true) {
-        // End program when reaching end of the program
+        // Ends program when reaching end of the code
         if (instructionPointer >= bfStringConst.length ) {
             console.log("Reached end of program.");
             break;
@@ -70,17 +72,18 @@ function bfInrpreter(bfString) {
                 continue;
             }            
         } else { // Other then <>+-.,[] all other charcters are ignored.
-            console.log("Ignored as comment.")
+            // console.log("Ignored as comment.")
         }
 
         // Step to next instruction
         instructionPointer++;
     }
 
-    printDebug(strOutput);   
+    // printDebug(strOutput);   
     return strOutput; 
 }
 
+// Checking to ensure data pointer is not moved outside array
 function boundChecker(newDataPointer) {
     if (newDataPointer >= memorySize || newDataPointer < 0 ) {
         console.log("Warning: Pointer moved outside of memory, ignored.");
@@ -90,6 +93,7 @@ function boundChecker(newDataPointer) {
     }
 }
 
+// Checks to make sure cell size stays between 0 and the max cell size
 function flowProtection(newCellValue) {
     if (newCellValue > cellSize || newCellValue < 0 ) {
         console.log("Warning: Instruction would cause overflow/underflow, ignored.");
@@ -99,6 +103,7 @@ function flowProtection(newCellValue) {
     } 
 }
 
+// Prints out the cell by appending the strOutput
 function printHandler(cellValue) {
     if (cellValue < 0 || cellValue > cellSize) {
         console.log("Error: Encounted unexpected memory value");
@@ -112,7 +117,9 @@ function printHandler(cellValue) {
     }
 }
 
-//keep going right, if another [  do a i++. then if ], check to make sure i <= 0 else i--j
+// Next two functions could likely have runtimes improved
+
+// Find the matching closing bracket
 function bracketMatchingRight(bfString,index) {
     let offset = 0;
     for (let i = index+1; i < bfString.length ; i++) {
@@ -127,6 +134,7 @@ function bracketMatchingRight(bfString,index) {
     return -1;
 }
 
+// Find the matching opening bracket
 function bracketMatchingLeft(bfString,index) {
     let offset = 0;
     for (let i = index-1; i >= 0 ; i--) {
@@ -141,6 +149,7 @@ function bracketMatchingLeft(bfString,index) {
     return -1;
 }
 
+// Checks the balancing of brackets
 function bracketChecker(bfString) {
     // To mark the code as read-only
     const bfStringConst = bfString;
@@ -164,6 +173,12 @@ function bracketChecker(bfString) {
         return false;
 }
 
+// Gets input from usr
+function getChar() {
+    const input = window.prompt("Enter the characher");
+    return input.charCodeAt(0);
+}
+
 function printDebug(printDebug) {
     console.log(`Final output: ${printDebug}`);
     console.log(`Final Memory:`);
@@ -171,9 +186,4 @@ function printDebug(printDebug) {
     console.log(`%iP: ${instructionPointer}`);
     console.log(`%dP: ${dataPointer}`);
     console.log(`Tested on ${memorySize} sized memory, ${cellSize} cell size`);
-}
-
-function getChar() {
-    const input = window.prompt("Enter the characher");
-    return input.charCodeAt(0);
 }
