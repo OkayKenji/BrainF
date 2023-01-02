@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js"></script> -->
   <link rel="stylesheet" type="text/css" href="style.css">
   <meta charset="utf-8" />
 
@@ -11,7 +11,16 @@
 <body style="background-color: black">
   <script src="script.js"></script>
   <textarea id="input" ></textarea>
-  <button onclick="output()">Generate Output</button>
+  <div>
+    <button onclick="decode()">Generate Decode V</button>
+    <button onclick="encode()">Generate Encode ^</button>
+    <select name="encoder" id="encoderType">
+      <option value="simple">Simple</option>
+      <option value="lazy">Lazy</option>
+      <option value="compressed" selected>Compressed</option>
+    </select>
+  </div>
+  
   <textarea id="output" ></textarea>
 </body>
 </html>

@@ -7,12 +7,30 @@ const memorySize = 30000;
 const cellSize = 127; //in decimal
 
 // Parent function to call all other functions
-function output() {
+function decode() {
     const input = document.getElementById('input').value;
     const output = bfInrpreter(input);
     document.getElementById('output').value = output;
 }
 
+function encode() {
+    const output = document.getElementById('output').value;
+    const encodeType = document.getElementById('encoderType').value;
+    let input;
+    if (encodeType == "compressed") {
+        input = compressedEncoder(output);
+    } else if (encodeType == "simple") { 
+        input = simpleEncoder(output);
+    } else if (encodeType == "lazy") { 
+        input = lazyEncoder(output);
+    } 
+    let x = compressedEncoder(output).length;
+    let y = simpleEncoder(output).length;
+    let z = lazyEncoder(output).length;
+    console.log(`${x} ${x/z} ${y} ${y/z} ${z} ${z/z}`);
+
+    document.getElementById('input').value = input;
+}
 function bfInrpreter(bfString) {
     // To mark the code as read-only
     const bfStringConst = bfString;
@@ -35,6 +53,7 @@ function bfInrpreter(bfString) {
     strOutput = "";
 
     // Start the program
+    //let temp = 0;
     while (true) {
         // Ends program when reaching end of the code
         if (instructionPointer >= bfStringConst.length ) {
@@ -44,8 +63,8 @@ function bfInrpreter(bfString) {
 
         // Get next instruction
         let currentInstruction = bfStringConst.charAt(instructionPointer);
-        // console.log(`Current instruction: ${currentInstruction}`);
-
+        //console.log(`Current instruction ${temp}: ${currentInstruction}`);
+        //temp++;
         // Instruction handler
         if (currentInstruction == '>') { // '>' moves dp to the right one memory space
             dataPointer = boundChecker(dataPointer + 1);
@@ -79,7 +98,8 @@ function bfInrpreter(bfString) {
         instructionPointer++;
     }
 
-    // printDebug(strOutput);   
+    // printDebug(strOutput); 
+    console.log(memoryArray);  
     return strOutput; 
 }
 
@@ -187,3 +207,63 @@ function printDebug(printDebug) {
     console.log(`%dP: ${dataPointer}`);
     console.log(`Tested on ${memorySize} sized memory, ${cellSize} cell size`);
 }
+
+let loopEnums = ["","+","++","+++","++++","+++++","++++++","+++++++","++++++++","+++++++++","++++++++++","+++++++++++","++++++++++++","+++++++++++++","++++++++++++++","+++++++++++++++",">++++[<++++>-]<",">++++[<++++>-]<+",">++++[<++++>-]<++",">+++++[<++++>-]<-",">+++++[<++++>-]<",">+++++[<++++>-]<+",">+++++[<++++>-]<++",">++++[<++++++>-]<-",">++++[<++++++>-]<",">+++++[<+++++>-]<",">+++++[<+++++>-]<+",">+++++[<+++++>-]<++",">+++++[<+++++>-]<+++",">+++++[<++++++>-]<-",">+++++[<++++++>-]<",">+++++[<++++++>-]<+",">++++[<++++++++>-]<",">++++[<++++++++>-]<+",">+++++[<+++++++>-]<-",">+++++[<+++++++>-]<",">++++++[<++++++>-]<",">++++++[<++++++>-]<+",">++++++[<++++++>-]<++",">+++++[<++++++++>-]<-",">+++++[<++++++++>-]<",">++++++[<+++++++>-]<-",">++++++[<+++++++>-]<",">++++++[<+++++++>-]<+",">++++++[<+++++++>-]<++",">+++++[<+++++++++>-]<",">+++++[<+++++++++>-]<+",">+++++++[<+++++++>-]<--",">+++++++[<+++++++>-]<-",">+++++++[<+++++++>-]<",">+++++[<++++++++++>-]<",">+++++++[<+++++++>-]<++",">+++++++[<+++++++>-]<+++",">++++++[<+++++++++>-]<-",">++++++[<+++++++++>-]<",">+++++++[<++++++++>-]<-",">+++++++[<++++++++>-]<",">+++++++[<++++++++>-]<",">+++++++[<++++++++>-]<+",">+++++++[<++++++++>-]<++",">++++++[<++++++++++>-]<",">++++++[<++++++++++>-]<+",">+++++++[<+++++++++>-]<-",">+++++++[<+++++++++>-]<",">++++++++[<++++++++>-]<",">++++++++[<++++++++>-]<+",">++++++[<+++++++++++>-]<",">++++++[<+++++++++++>-]<+",">+++++++[<+++++++++++>-]<-",">+++++++[<++++++++++>-]<-",">+++++++[<++++++++++>-]<",">++++++++[<+++++++++>-]<-",">++++++++[<+++++++++>-]<",">++++++++[<+++++++++>-]<+",">++++++++[<+++++++++>-]<++",">++++++++[<+++++++++>-]<+++",">+++++++[<+++++++++++>-]<-",">+++++++[<+++++++++++>-]<",">+++++++[<+++++++++++>-]<+",">++++++++[<++++++++++>-]<-",">++++++++[<++++++++++>-]<",">+++++++++[<+++++++++>-]<",">+++++++++[<+++++++++>-]<+",">+++++++++[<+++++++++>-]<++",">+++++++[<++++++++++++>-]<",">+++++++[<++++++++++++>-]<+",">++++++++[<+++++++++++>-]<--",">++++++++[<+++++++++++>-]<-",">++++++++[<+++++++++++>-]<",">+++++++++[<++++++++++>-]<-",">+++++++++[<++++++++++>-]<",">+++++++++[<++++++++++>-]<+",">+++++++++[<++++++++++>-]<++",">+++++++++[<++++++++++>-]<+++",">++++++++[<++++++++++++>-]<--",">++++++++[<++++++++++++>-]<-",">++++++++[<++++++++++++>-]<",">++++++++[<++++++++++++>-]<+",">+++++++++[<+++++++++++>-]<-",">+++++++++[<+++++++++++>-]<",">++++++++++[<++++++++++>-]<",">++++++++++[<++++++++++>-]<+",">++++++++++[<++++++++++>-]<++",">++++++++[<+++++++++++++>-]<-",">++++++++[<+++++++++++++>-]<",">++++++++[<+++++++++++++>-]<+",">+++++++++[<++++++++++++>-]<--",">+++++++++[<++++++++++++>-]<-",">+++++++++[<++++++++++++>-]<",">++++++++++[<+++++++++++>-]<-",">++++++++++[<+++++++++++>-]<",">++++++++++[<+++++++++++>-]<+",">++++++++[<++++++++++++++>-]<",">++++++++[<++++++++++++++>-]<+",">++++++++[<++++++++++++++>-]<++",">+++++++++[<+++++++++++++>-]<--",">+++++++++[<+++++++++++++>-]<-",">+++++++++[<+++++++++++++>-]<",">+++++++++[<+++++++++++++>-]<+",">++++++++++[<++++++++++++>-]<-",">++++++++++[<++++++++++++>-]<",">+++++++++++[<+++++++++++>-]<",">+++++++++++[<+++++++++++>-]<+",">+++++++++++[<+++++++++++>-]<++",">+++++++++++[<+++++++++++>-]<+++",">+++++++++[<++++++++++++++>-]<-",">+++++++++[<++++++++++++++>-]<",">+++++++++[<++++++++++++++>-]<+"];
+function compressedEncoder(string) {
+    let remNum = string.charCodeAt(0);
+    let str = "";
+    for (let i = 0 ; i < string.length ; i++) {
+
+        if (remNum >= 0) {
+            str += loopEnums[remNum];
+        } else {
+           let tempString = loopEnums[Math.abs(remNum)];
+           if (Math.abs(remNum)<16) {
+            str += tempString.replaceAll("+","-");
+           } else {
+            str += `${tempString.substring(0,tempString.indexOf('<'))}${tempString.substring(tempString.indexOf('<'),tempString.lastIndexOf('>')).replaceAll("+","-")}>-]<`;
+            let lastIncrmenting = `${tempString.substring(tempString.lastIndexOf('<')+1)}`;
+            if (lastIncrmenting == '')
+                str += '';
+            else if (lastIncrmenting.charAt(0) == "+") 
+                str += lastIncrmenting.replaceAll("+","-");
+            else if (lastIncrmenting.charAt(0) == "-") 
+                str += lastIncrmenting.replaceAll("-","+");
+           }
+        }
+        
+
+        str+=`.`;
+        remNum = string.charCodeAt(i+1) - string.charCodeAt(i);
+    }
+    return str;
+}
+
+function simpleEncoder(string) {
+    let remNum = string.charCodeAt(0);
+    let str = "";
+    for (let i = 0 ; i < string.length ; i++) {
+        for (let j = 0 ; j < remNum ; j++) {
+            str+="+";
+        } 
+        for (let j = 0 ; j > remNum ; j--) {
+            str+="-";
+        }
+
+        str+=".";
+        remNum = string.charCodeAt(i+1) - string.charCodeAt(i);
+    }
+    return str;
+}
+
+function lazyEncoder(string) {
+    let str = "";
+    for (let char of string) {
+        for (let i = 0 ; i < char.charCodeAt(0) ; i++) {
+            str+="+";
+        }
+        str+=".[-]";
+    }
+    return str;
+}
+
