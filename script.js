@@ -249,7 +249,7 @@ function compressedEncoder(string) {
         }
         
 
-        str+=`.\n`;
+        str+=`.`;
         remNum = string.charCodeAt(i+1) - string.charCodeAt(i);
         // if (Math.abs(remNum)>127)
         
