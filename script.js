@@ -16,10 +16,10 @@ function decode() {
 function encode() {
     let output1 = document.getElementById('output').value;
     let output = "";
-    for (let i = 0 ; i < output1.length ; i++) {
-        if (output1.charCodeAt(i) >= 127) {
+    for (let i = 0; i < output1.length; i++) {
+        if (output1.charCodeAt(i) > cellSize) {
             output += "";
-           // console.log("replacemnet")
+            // console.log("replacemnet")
         } else {
             output += output1.charAt(i);
         }
@@ -31,15 +31,15 @@ function encode() {
     let input;
     if (encodeType == "compressed") {
         input = compressedEncoder(output);
-    } else if (encodeType == "simple") { 
+    } else if (encodeType == "simple") {
         input = simpleEncoder(output);
-    } else if (encodeType == "lazy") { 
+    } else if (encodeType == "lazy") {
         input = lazyEncoder(output);
-    } 
+    }
     let x = compressedEncoder(output).length;
     let y = simpleEncoder(output).length;
     let z = lazyEncoder(output).length;
-    console.log(`${x} ${x/z} ${y} ${y/z} ${z} ${z/z}`);
+    console.log(`${x} ${x / z} ${y} ${y / z} ${z} ${z / z}`);
 
     document.getElementById('input').value = input;
 }
@@ -49,7 +49,7 @@ function bfInrpreter(bfString) {
 
     // Parses bf code to check bracket balancing
     if (!bracketChecker(bfString)) {
-        return "Unbalanced number of brackets."; 
+        return "Unbalanced number of brackets.";
     }
 
     // Allocates the memory space for the array of 0s
@@ -58,8 +58,8 @@ function bfInrpreter(bfString) {
     memoryArray.fill(0);
 
     // Intilaize the pointers
-    instructionPointer = 0; 
-    dataPointer = 0; 
+    instructionPointer = 0;
+    dataPointer = 0;
 
     //Stores output
     strOutput = "";
@@ -68,7 +68,7 @@ function bfInrpreter(bfString) {
     //let temp = 0;
     while (true) {
         // Ends program when reaching end of the code
-        if (instructionPointer >= bfStringConst.length ) {
+        if (instructionPointer >= bfStringConst.length) {
             console.log("Reached end of program.");
             break;
         }
@@ -93,16 +93,18 @@ function bfInrpreter(bfString) {
             memoryArray[dataPointer] = getChar();
         } else if (currentInstruction == '[') { // Begins loop, if dp points to memory that is 0, jumps to after next ']'
             if (memoryArray[dataPointer] == 0) {
-                instructionPointer = bracketMatchingRight(bfString,instructionPointer) + 1; 
+                instructionPointer = bracketMatchingRight(bfString, instructionPointer) + 1;
+                // console.log('97 caused end loop');
                 // console.log(instructionPointer);
                 continue;
             }
         } else if (currentInstruction == ']') { // Can end loop, if dp points to memory that is non-0 jumps back to previous ']'
             if (memoryArray[dataPointer] != 0) {
-                instructionPointer = bracketMatchingLeft(bfString,instructionPointer); 
+                instructionPointer = bracketMatchingLeft(bfString, instructionPointer);
                 // console.log(instructionPointer);
                 continue;
-            }            
+            }
+            // console.log('105 caused end loop');         
         } else { // Other then <>+-.,[] all other charcters are ignored.
             // console.log("Ignored as comment.")
         }
@@ -112,13 +114,13 @@ function bfInrpreter(bfString) {
     }
 
     // printDebug(strOutput); 
-    console.log(memoryArray);  
-    return strOutput; 
+    console.log(memoryArray);
+    return strOutput;
 }
 
 // Checking to ensure data pointer is not moved outside array
 function boundChecker(newDataPointer) {
-    if (newDataPointer >= memorySize || newDataPointer < 0 ) {
+    if (newDataPointer >= memorySize || newDataPointer < 0) {
         console.log("Warning: Pointer moved outside of memory, ignored.");
         return dataPointer;
     } else {
@@ -128,12 +130,12 @@ function boundChecker(newDataPointer) {
 
 // Checks to make sure cell size stays between 0 and the max cell size
 function flowProtection(newCellValue) {
-    if (newCellValue > cellSize || newCellValue < 0 ) {
+    if (newCellValue > cellSize || newCellValue < 0) {
         console.log("Warning: Instruction would cause overflow/underflow, ignored.");
         return memoryArray[dataPointer];
     } else {
         return newCellValue;
-    } 
+    }
 }
 
 // Prints out the cell by appending the strOutput
@@ -153,9 +155,9 @@ function printHandler(cellValue) {
 // Next two functions could likely have runtimes improved
 
 // Find the matching closing bracket
-function bracketMatchingRight(bfString,index) {
+function bracketMatchingRight(bfString, index) {
     let offset = 0;
-    for (let i = index+1; i < bfString.length ; i++) {
+    for (let i = index + 1; i < bfString.length; i++) {
         if (bfString[i] == '[') {
             offset++;
         } else if (bfString[i] == ']' && offset > 0) {
@@ -168,9 +170,9 @@ function bracketMatchingRight(bfString,index) {
 }
 
 // Find the matching opening bracket
-function bracketMatchingLeft(bfString,index) {
+function bracketMatchingLeft(bfString, index) {
     let offset = 0;
-    for (let i = index-1; i >= 0 ; i--) {
+    for (let i = index - 1; i >= 0; i--) {
         if (bfString[i] == ']') {
             offset++;
         } else if (bfString[i] == '[' && offset > 0) {
@@ -221,38 +223,48 @@ function printDebug(printDebug) {
     console.log(`Tested on ${memorySize} sized memory, ${cellSize} cell size`);
 }
 
-let loopEnums = ["","+","++","+++","++++","+++++","++++++","+++++++","++++++++","+++++++++","++++++++++","+++++++++++","++++++++++++","+++++++++++++","++++++++++++++","+++++++++++++++",">++++[<++++>-]<",">++++[<++++>-]<+",">++++[<++++>-]<++",">+++++[<++++>-]<-",">+++++[<++++>-]<",">+++++[<++++>-]<+",">+++++[<++++>-]<++",">++++[<++++++>-]<-",">++++[<++++++>-]<",">+++++[<+++++>-]<",">+++++[<+++++>-]<+",">+++++[<+++++>-]<++",">+++++[<+++++>-]<+++",">+++++[<++++++>-]<-",">+++++[<++++++>-]<",">+++++[<++++++>-]<+",">++++[<++++++++>-]<",">++++[<++++++++>-]<+",">+++++[<+++++++>-]<-",">+++++[<+++++++>-]<",">++++++[<++++++>-]<",">++++++[<++++++>-]<+",">++++++[<++++++>-]<++",">+++++[<++++++++>-]<-",">+++++[<++++++++>-]<",">++++++[<+++++++>-]<-",">++++++[<+++++++>-]<",">++++++[<+++++++>-]<+",">++++++[<+++++++>-]<++",">+++++[<+++++++++>-]<",">+++++[<+++++++++>-]<+",">+++++++[<+++++++>-]<--",">+++++++[<+++++++>-]<-",">+++++++[<+++++++>-]<",">+++++[<++++++++++>-]<",">+++++++[<+++++++>-]<++",">+++++++[<+++++++>-]<+++",">++++++[<+++++++++>-]<-",">++++++[<+++++++++>-]<",">+++++++[<++++++++>-]<-",">+++++++[<++++++++>-]<",">+++++++[<++++++++>-]<+",">+++++++[<++++++++>-]<++",">++++++[<++++++++++>-]<-",">++++++[<++++++++++>-]<",">++++++[<++++++++++>-]<+",">+++++++[<+++++++++>-]<-",">+++++++[<+++++++++>-]<",">++++++++[<++++++++>-]<",">++++++++[<++++++++>-]<+",">++++++[<+++++++++++>-]<",">++++++[<+++++++++++>-]<+",">+++++++[<++++++++++>-]<--",">+++++++[<++++++++++>-]<-",">+++++++[<++++++++++>-]<",">++++++++[<+++++++++>-]<-",">++++++++[<+++++++++>-]<",">++++++++[<+++++++++>-]<+",">++++++++[<+++++++++>-]<++",">++++++++[<+++++++++>-]<+++",">+++++++[<+++++++++++>-]<-",">+++++++[<+++++++++++>-]<",">+++++++[<+++++++++++>-]<+",">++++++++[<++++++++++>-]<-",">++++++++[<++++++++++>-]<",">+++++++++[<+++++++++>-]<",">+++++++++[<+++++++++>-]<+",">+++++++++[<+++++++++>-]<++",">+++++++[<++++++++++++>-]<",">+++++++[<++++++++++++>-]<+",">++++++++[<+++++++++++>-]<--",">++++++++[<+++++++++++>-]<-",">++++++++[<+++++++++++>-]<",">+++++++++[<++++++++++>-]<-",">+++++++++[<++++++++++>-]<",">+++++++++[<++++++++++>-]<+",">+++++++++[<++++++++++>-]<++",">+++++++++[<++++++++++>-]<+++",">++++++++[<++++++++++++>-]<--",">++++++++[<++++++++++++>-]<-",">++++++++[<++++++++++++>-]<",">++++++++[<++++++++++++>-]<+",">+++++++++[<+++++++++++>-]<-",">+++++++++[<+++++++++++>-]<",">++++++++++[<++++++++++>-]<",">++++++++++[<++++++++++>-]<+",">++++++++++[<++++++++++>-]<++",">++++++++[<+++++++++++++>-]<-",">++++++++[<+++++++++++++>-]<",">++++++++[<+++++++++++++>-]<+",">+++++++++[<++++++++++++>-]<--",">+++++++++[<++++++++++++>-]<-",">+++++++++[<++++++++++++>-]<",">++++++++++[<+++++++++++>-]<-",">++++++++++[<+++++++++++>-]<",">++++++++++[<+++++++++++>-]<+",">++++++++[<++++++++++++++>-]<",">++++++++[<++++++++++++++>-]<+",">++++++++[<++++++++++++++>-]<++",">+++++++++[<+++++++++++++>-]<--",">+++++++++[<+++++++++++++>-]<-",">+++++++++[<+++++++++++++>-]<",">+++++++++[<+++++++++++++>-]<+",">++++++++++[<++++++++++++>-]<-",">++++++++++[<++++++++++++>-]<",">+++++++++++[<+++++++++++>-]<",">+++++++++++[<+++++++++++>-]<+",">+++++++++++[<+++++++++++>-]<++",">+++++++++++[<+++++++++++>-]<+++",">+++++++++[<++++++++++++++>-]<-",">+++++++++[<++++++++++++++>-]<",">+++++++++[<++++++++++++++>-]<+"];
+let loopEnums = ["", "+", "++", "+++", "++++", "+++++", "++++++", "+++++++", "++++++++", "+++++++++", "++++++++++", "+++++++++++", "++++++++++++", "+++++++++++++", "++++++++++++++", "+++++++++++++++", ">++++[<++++>-]<", ">++++[<++++>-]<+", ">++++[<++++>-]<++", ">+++++[<++++>-]<-", ">+++++[<++++>-]<", ">+++++[<++++>-]<+", ">+++++[<++++>-]<++", ">++++[<++++++>-]<-", ">++++[<++++++>-]<", ">+++++[<+++++>-]<", ">+++++[<+++++>-]<+", ">+++++[<+++++>-]<++", ">+++++[<+++++>-]<+++", ">+++++[<++++++>-]<-", ">+++++[<++++++>-]<", ">+++++[<++++++>-]<+", ">++++[<++++++++>-]<", ">++++[<++++++++>-]<+", ">+++++[<+++++++>-]<-", ">+++++[<+++++++>-]<", ">++++++[<++++++>-]<", ">++++++[<++++++>-]<+", ">++++++[<++++++>-]<++", ">+++++[<++++++++>-]<-", ">+++++[<++++++++>-]<", ">++++++[<+++++++>-]<-", ">++++++[<+++++++>-]<", ">++++++[<+++++++>-]<+", ">++++++[<+++++++>-]<++", ">+++++[<+++++++++>-]<", ">+++++[<+++++++++>-]<+", ">+++++++[<+++++++>-]<--", ">+++++++[<+++++++>-]<-", ">+++++++[<+++++++>-]<", ">+++++[<++++++++++>-]<", ">+++++++[<+++++++>-]<++", ">+++++++[<+++++++>-]<+++", ">++++++[<+++++++++>-]<-", ">++++++[<+++++++++>-]<", ">+++++++[<++++++++>-]<-", ">+++++++[<++++++++>-]<", ">+++++++[<++++++++>-]<+", ">+++++++[<++++++++>-]<++", ">++++++[<++++++++++>-]<-", ">++++++[<++++++++++>-]<", ">++++++[<++++++++++>-]<+", ">+++++++[<+++++++++>-]<-", ">+++++++[<+++++++++>-]<", ">++++++++[<++++++++>-]<", ">++++++++[<++++++++>-]<+", ">++++++[<+++++++++++>-]<", ">++++++[<+++++++++++>-]<+", ">+++++++[<++++++++++>-]<--", ">+++++++[<++++++++++>-]<-", ">+++++++[<++++++++++>-]<", ">++++++++[<+++++++++>-]<-", ">++++++++[<+++++++++>-]<", ">++++++++[<+++++++++>-]<+", ">++++++++[<+++++++++>-]<++", ">++++++++[<+++++++++>-]<+++", ">+++++++[<+++++++++++>-]<-", ">+++++++[<+++++++++++>-]<", ">+++++++[<+++++++++++>-]<+", ">++++++++[<++++++++++>-]<-", ">++++++++[<++++++++++>-]<", ">+++++++++[<+++++++++>-]<", ">+++++++++[<+++++++++>-]<+", ">+++++++++[<+++++++++>-]<++", ">+++++++[<++++++++++++>-]<", ">+++++++[<++++++++++++>-]<+", ">++++++++[<+++++++++++>-]<--", ">++++++++[<+++++++++++>-]<-", ">++++++++[<+++++++++++>-]<", ">+++++++++[<++++++++++>-]<-", ">+++++++++[<++++++++++>-]<", ">+++++++++[<++++++++++>-]<+", ">+++++++++[<++++++++++>-]<++", ">+++++++++[<++++++++++>-]<+++", ">++++++++[<++++++++++++>-]<--", ">++++++++[<++++++++++++>-]<-", ">++++++++[<++++++++++++>-]<", ">++++++++[<++++++++++++>-]<+", ">+++++++++[<+++++++++++>-]<-", ">+++++++++[<+++++++++++>-]<", ">++++++++++[<++++++++++>-]<", ">++++++++++[<++++++++++>-]<+", ">++++++++++[<++++++++++>-]<++", ">++++++++[<+++++++++++++>-]<-", ">++++++++[<+++++++++++++>-]<", ">++++++++[<+++++++++++++>-]<+", ">+++++++++[<++++++++++++>-]<--", ">+++++++++[<++++++++++++>-]<-", ">+++++++++[<++++++++++++>-]<", ">++++++++++[<+++++++++++>-]<-", ">++++++++++[<+++++++++++>-]<", ">++++++++++[<+++++++++++>-]<+", ">++++++++[<++++++++++++++>-]<", ">++++++++[<++++++++++++++>-]<+", ">++++++++[<++++++++++++++>-]<++", ">+++++++++[<+++++++++++++>-]<--", ">+++++++++[<+++++++++++++>-]<-", ">+++++++++[<+++++++++++++>-]<", ">+++++++++[<+++++++++++++>-]<+", ">++++++++++[<++++++++++++>-]<-", ">++++++++++[<++++++++++++>-]<", ">+++++++++++[<+++++++++++>-]<", ">+++++++++++[<+++++++++++>-]<+", ">+++++++++++[<+++++++++++>-]<++", ">+++++++++++[<+++++++++++>-]<+++", ">+++++++++[<++++++++++++++>-]<-", ">+++++++++[<++++++++++++++>-]<", ">+++++++++[<++++++++++++++>-]<+"];
 function compressedEncoder(string) {
     let remNum = string.charCodeAt(0);
     let str = "";
-    for (let i = 0 ; i < string.length ; i++) {
+    for (let i = 0; i < string.length; i++) {
         //console.log(remNum);
-        if (Math.abs(remNum)>=127) {
+        if (Math.abs(remNum) > cellSize) {
             console.log(`Error: ${string.charAt(i)} ${string.charCodeAt(i)}`)
-        } 
+        }
         if (remNum >= 0) {
             str += loopEnums[remNum];
         } else {
-           let tempString = loopEnums[Math.abs(remNum)];
-           if (Math.abs(remNum)<16) {
-            str += tempString.replaceAll("+","-");
-           } else {
-            str += `${tempString.substring(0,tempString.indexOf('<'))}${tempString.substring(tempString.indexOf('<'),tempString.lastIndexOf('>')).replaceAll("+","-")}>-]<`;
-            let lastIncrmenting = `${tempString.substring(tempString.lastIndexOf('<')+1)}`;
-            if (lastIncrmenting == '')
-                str += '';
-            else if (lastIncrmenting.charAt(0) == "+") 
-                str += lastIncrmenting.replaceAll("+","-");
-            else if (lastIncrmenting.charAt(0) == "-") 
-                str += lastIncrmenting.replaceAll("-","+");
-           }
-        }
-        
+            let tempString = loopEnums[Math.abs(remNum)];
+            //console.log(tempString.length); 
+            //string.charCodeAt(i+1);
 
-        str+=`.`;
-        remNum = string.charCodeAt(i+1) - string.charCodeAt(i);
-        // if (Math.abs(remNum)>127)
-        
+            // 397168 0.15852795018660068 802071 0.32014329335222624 2505350 1
+            // 381032 0.1520873331071507 802071 0.32014329335222624 2505350 1
+
+            if (`[-]${loopEnums[string.charCodeAt(i)]}`.length < tempString.length) {
+                // console.log(`[-]${loopEnums[string.charCodeAt(i)]} (${string.charCodeAt(i)} ${`[-]${loopEnums[string.charCodeAt(i)]}`.length}) versus ${tempString} (${remNum} ${tempString.length})`);
+                // console.log(`(${string.charCodeAt(i)} ${`[-]${loopEnums[string.charCodeAt(i)]}`.length}) versus (${remNum} ${tempString.length})`);
+                str += `[-]${loopEnums[string.charCodeAt(i)]}`;
+            } else if (Math.abs(remNum) < 16) {
+                str += tempString.replaceAll("+", "-");
+            } else {
+                str += `${tempString.substring(0, tempString.indexOf('<'))}${tempString.substring(tempString.indexOf('<'), tempString.lastIndexOf('>')).replaceAll("+", "-")}>-]<`;
+                let lastIncrmenting = `${tempString.substring(tempString.lastIndexOf('<') + 1)}`;
+                if (lastIncrmenting == '')
+                    str += '';
+                else if (lastIncrmenting.charAt(0) == "+")
+                    str += lastIncrmenting.replaceAll("+", "-");
+                else if (lastIncrmenting.charAt(0) == "-")
+                    str += lastIncrmenting.replaceAll("-", "+");
+            }
+        }
+        //str+=`[-]${loopEnums[string.charCodeAt(i)]}`
+
+        str += `.`;
+        remNum = string.charCodeAt(i + 1) - string.charCodeAt(i);
+        // if (Math.abs(remNum)>cellSize)
+
         //     remNum = 32;
     }
     return str;
@@ -261,16 +273,16 @@ function compressedEncoder(string) {
 function simpleEncoder(string) {
     let remNum = string.charCodeAt(0);
     let str = "";
-    for (let i = 0 ; i < string.length ; i++) {
-        for (let j = 0 ; j < remNum ; j++) {
-            str+="+";
-        } 
-        for (let j = 0 ; j > remNum ; j--) {
-            str+="-";
+    for (let i = 0; i < string.length; i++) {
+        for (let j = 0; j < remNum; j++) {
+            str += "+";
+        }
+        for (let j = 0; j > remNum; j--) {
+            str += "-";
         }
 
-        str+=".";
-        remNum = string.charCodeAt(i+1) - string.charCodeAt(i);
+        str += ".";
+        remNum = string.charCodeAt(i + 1) - string.charCodeAt(i);
     }
     return str;
 }
@@ -278,10 +290,10 @@ function simpleEncoder(string) {
 function lazyEncoder(string) {
     let str = "";
     for (let char of string) {
-        for (let i = 0 ; i < char.charCodeAt(0) ; i++) {
-            str+="+";
+        for (let i = 0; i < char.charCodeAt(0); i++) {
+            str += "+";
         }
-        str+=".[-]";
+        str += ".[-]";
     }
     return str;
 }
