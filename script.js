@@ -253,8 +253,8 @@ function compressedEncoder(string) {
                 for (let j = 0 ; j < Math.abs(remNum) ; j++)
                     tempStringa += "-";
                 str += tempStringa;
-                console.log(string.charCodeAt(i + 1) - string.charCodeAt(i));
-                console.log(string.charAt(i + 1) + " " +  string.charAt(i));
+                // console.log(string.charCodeAt(i + 1) - string.charCodeAt(i));
+                // console.log(string.charAt(i + 1) + " " +  string.charAt(i));
             } else if (`[-]${loopEnums[string.charCodeAt(i)]}`.length < tempString.length) {
                 // console.log(`[-]${loopEnums[string.charCodeAt(i)]} (${string.charCodeAt(i)} ${`[-]${loopEnums[string.charCodeAt(i)]}`.length}) versus ${tempString} (${remNum} ${tempString.length})`);
                 // console.log(`(${string.charCodeAt(i)} ${`[-]${loopEnums[string.charCodeAt(i)]}`.length}) versus (${remNum} ${tempString.length})`);
