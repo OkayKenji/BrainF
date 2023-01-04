@@ -4,7 +4,7 @@ let instructionPointer;
 let dataPointer;
 let strOutput;
 const memorySize = 30000;
-const cellSize = 127; //in decimal
+const cellSize = Math.pow(2,16)-1; //in decimal 7
 
 // Parent function to call all other functions
 function decode() {
@@ -233,7 +233,13 @@ function compressedEncoder(string) {
             console.log(`Error: ${string.charAt(i)} ${string.charCodeAt(i)}`)
         }
         if (remNum >= 0) {
-            str += loopEnums[remNum];
+            if (remNum>127) {
+                let tempString = "";
+                for (let j = 0 ; j < remNum ; j++)
+                    tempString += "+";
+                str += tempString;
+            } else 
+                str += loopEnums[remNum];
         } else {
             let tempString = loopEnums[Math.abs(remNum)];
             //console.log(tempString.length); 
@@ -242,7 +248,14 @@ function compressedEncoder(string) {
             // 397168 0.15852795018660068 802071 0.32014329335222624 2505350 1
             // 381032 0.1520873331071507 802071 0.32014329335222624 2505350 1
 
-            if (`[-]${loopEnums[string.charCodeAt(i)]}`.length < tempString.length) {
+            if (Math.abs(remNum)>127) {
+                let tempStringa = "";
+                for (let j = 0 ; j < Math.abs(remNum) ; j++)
+                    tempStringa += "-";
+                str += tempStringa;
+                console.log(string.charCodeAt(i + 1) - string.charCodeAt(i));
+                console.log(string.charAt(i + 1) + " " +  string.charAt(i));
+            } else if (`[-]${loopEnums[string.charCodeAt(i)]}`.length < tempString.length) {
                 // console.log(`[-]${loopEnums[string.charCodeAt(i)]} (${string.charCodeAt(i)} ${`[-]${loopEnums[string.charCodeAt(i)]}`.length}) versus ${tempString} (${remNum} ${tempString.length})`);
                 // console.log(`(${string.charCodeAt(i)} ${`[-]${loopEnums[string.charCodeAt(i)]}`.length}) versus (${remNum} ${tempString.length})`);
                 str += `[-]${loopEnums[string.charCodeAt(i)]}`;
